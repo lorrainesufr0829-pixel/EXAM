@@ -4,7 +4,29 @@
     <title>My Website</title>
 </head>
 <body>
-    <h1>Hello World!</h1>
-    <p>This is my first GitHub Pages website.</p>
+    <h1>WELCOM!</h1>
+    <p>This is my page for releasing my pressure.</p>
+
+<nav>
+    <a href="index.html">Home</a>
+    <a href="law.html">Law</a>
+    <a href="french.html">French</a>
+</nav>
+
+<button id="darkModeBtn">🌙 Dark Mode</button>
+
+<script>
+document.getElementById("darkModeBtn").addEventListener("click", function() {
+    document.body.classList.toggle("dark");
+});
+</script>
+
+<style>
+.dark {
+    background: #121212;
+    color: white;
+}
+</style>
+
 </body>
 </html>
