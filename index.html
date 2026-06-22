@@ -1,32 +1,50 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>My Website</title>
+    <title>Rachel Notes</title>
+
+    <style>
+        body {
+            max-width: 800px;
+            margin: auto;
+            padding: 40px;
+            font-family: Georgia, serif;
+            line-height: 1.8;
+            background-color: #ffffff;
+            transition: background-color 0.3s;
+        }
+
+        .toolbar {
+            margin-bottom: 20px;
+        }
+
+        input[type="color"] {
+            width: 50px;
+            height: 35px;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
 </head>
+
 <body>
-    <h1>WELCOM!</h1>
-    <p>This is my page for releasing my pressure.</p>
 
-<nav>
-    <a href="index.html">Home</a>
-    <a href="law.html">Law</a>
-    <a href="french.html">French</a>
-</nav>
+    <div class="toolbar">
+        <label>Choose page color:</label>
+        <input type="color" id="colorPicker" value="#ffffff">
+    </div>
 
-<button id="darkModeBtn">🌙 Dark Mode</button>
+    <h1>Rachel Notes</h1>
 
-<script>
-document.getElementById("darkModeBtn").addEventListener("click", function() {
-    document.body.classList.toggle("dark");
-});
-</script>
+    <p>Welcome to my public academic notebook.</p>
 
-<style>
-.dark {
-    background: #121212;
-    color: white;
-}
-</style>
+    <script>
+        const picker = document.getElementById("colorPicker");
+
+        picker.addEventListener("input", function () {
+            document.body.style.backgroundColor = this.value;
+        });
+    </script>
 
 </body>
 </html>
