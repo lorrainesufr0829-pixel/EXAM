@@ -1,85 +1,67 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-    <title>Rachel Notes</title>
+    <meta charset="UTF-8">
+    <title>My Notes</title>
 
-
-</ul>
-    <style>
-        body {
-            max-width: 800px;
-            margin: auto;
-            padding: 40px;
-            font-family: Georgia, serif;
-            line-height: 1.8;
-            background-color: #ffffff;
-            transition: background-color 0.3s;
-        }
-
-        .toolbar {
-            margin-bottom: 20px;
-        }
-
-        input[type="color"] {
-            width: 50px;
-            height: 35px;
-            border: none;
-            cursor: pointer;
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-    <div class="toolbar">
-        <label>Choose page color:</label>
-        <input type="color" id="colorPicker" value="#ffffff">
-    </div>
+<header>
 
-    <h1>Rachel Notes</h1>
+    <h1>📚 My Notes & Diary</h1>
 
-    <p>Welcome to my public academic notebook.</p>
+    <button id="settingBtn">
+        ⚙️
+    </button>
 
-    <script>
-        const picker = document.getElementById("colorPicker");
+</header>
 
-        picker.addEventListener("input", function () {
-            document.body.style.backgroundColor = this.value;
-        });
-    </script>
-<textarea id="note" rows="10" cols="50"></textarea>
+<div id="settingsPanel">
 
-<button onclick="saveNote()">
-Save Note
-</button>
+    <h3>Theme Color</h3>
 
-<script>
-const saved = localStorage.getItem("note");
+    <input type="color" id="themePicker">
 
-if(saved){
-    document.getElementById("note").value = saved;
-}
+</div>
 
-function saveNote(){
-    const text =
-        document.getElementById("note").value;
+<section class="upload-section">
 
-    localStorage.setItem("note", text);
+    <input type="file" id="fileInput">
 
-    alert("Saved!");
-}
-</script>
+    <select id="category">
 
-        <input
-    type="text"
-    id="searchBox"
-    placeholder="Search notes..."
->
+        <option>Diary</option>
+        <option>Law</option>
+        <option>French</option>
+        <option>Study</option>
+
+    </select>
+
+    <button onclick="saveNote()">
+        Save
+    </button>
+
+</section>
+
+<section>
+
+    <input
+        type="text"
+        id="searchBox"
+        placeholder="Search notes..."
+    >
+
+</section>
 
 <ul id="noteList">
-    <li>Environmental Law</li>
-    <li>Competition Law</li>
-    <li>DALF C1 Vocabulary</li>
-    <li>Jurisprudence</li>
+
+</ul>
+
+<script src="script.js"></script>
+
 </body>
 </html>
