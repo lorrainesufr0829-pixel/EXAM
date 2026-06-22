@@ -1,75 +1,213 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-    <meta charset="UTF-8">
-    <title>My Notes</title>
+<meta charset="UTF-8">
+<title>My Notes</title>
 
-    <link rel="stylesheet" href="style.css">
+<style>
+
+body{
+font-family:Arial;
+max-width:900px;
+margin:auto;
+padding:20px;
+transition:0.3s;
+}
+
+header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+#settings{
+display:none;
+padding:15px;
+border:1px solid #ddd;
+margin-top:10px;
+border-radius:8px;
+}
+
+.note{
+padding:10px;
+margin:10px 0;
+border:1px solid #ddd;
+border-radius:8px;
+}
+
+</style>
+
 </head>
 
 <body>
 
 <header>
 
-    <h1>📚 My Notes & Diary</h1>
+<h1>📚 My Notes</h1>
 
-   <header>
-
-    <h1>📚 My Notes & Diary</h1>
-
-    <div class="settings-container">
-
-        <button id="settingBtn">
-            ⚙️
-        </button>
-
-        <div id="settingsPanel">
-
-            <h4>Page Color</h4>
-
-            <input type="color" id="themePicker">
-
-        </div>
-
-    </div>
+<button onclick="toggleSettings()">
+⚙️
+</button>
 
 </header>
 
-<section class="upload-section">
+<div id="settings">
 
-    <input type="file" id="fileInput">
+<h3>Page Color</h3>
 
-    <select id="category">
+<input type="color" id="colorPicker">
 
-        <option>Diary</option>
-        <option>Law</option>
-        <option>French</option>
-        <option>Study</option>
+</div>
 
-    </select>
+<h2>Add Note</h2>
 
-    <button onclick="saveNote()">
-        Save
-    </button>
+<input
+type="text"
+id="title"
+placeholder="Title"
+>
 
-</section>
+<select id="category">
 
-<section>
+<option>Law</option>
+<option>French</option>
+<option>Diary</option>
+<option>Study</option>
 
-    <input
-        type="text"
-        id="searchBox"
-        placeholder="Search notes..."
-    >
+</select>
 
-</section>
+<textarea
+id="content"
+placeholder="Write something..."
+style="width:100%;height:120px;"
+></textarea>
 
-<ul id="noteList">
+<br><br>
 
-</ul>
+<button onclick="saveNote()">
+Save Note
+</button>
 
-<script src="script.js"></script>
+<hr>
+
+<input
+type="text"
+id="search"
+placeholder="Search..."
+onkeyup="renderNotes()"
+>
+
+<div id="notes"></div>
+
+<script>
+
+function toggleSettings(){
+
+const panel =
+document.getElementById("settings");
+
+panel.style.display =
+panel.style.display==="block"
+? "none"
+: "block";
+
+}
+
+const picker =
+document.getElementById("colorPicker");
+
+picker.addEventListener("input",()=>{
+
+document.body.style.backgroundColor =
+picker.value;
+
+localStorage.setItem(
+"theme",
+picker.value
+);
+
+});
+
+const savedTheme =
+localStorage.getItem("theme");
+
+if(savedTheme){
+
+document.body.style.backgroundColor =
+savedTheme;
+
+}
+
+function saveNote(){
+
+const title =
+document.getElementById("title").value;
+
+const category =
+document.getElementById("category").value;
+
+const content =
+document.getElementById("content").value;
+
+let notes =
+JSON.parse(
+localStorage.getItem("notes")
+) || [];
+
+notes.push({
+title,
+category,
+content
+});
+
+localStorage.setItem(
+"notes",
+JSON.stringify(notes)
+);
+
+renderNotes();
+
+}
+
+function renderNotes(){
+
+const notesDiv =
+document.getElementById("notes");
+
+const keyword =
+document.getElementById("search")
+.value.toLowerCase();
+
+let notes =
+JSON.parse(
+localStorage.getItem("notes")
+) || [];
+
+notesDiv.innerHTML="";
+
+notes
+.filter(note =>
+note.title.toLowerCase().includes(keyword)
+||
+note.content.toLowerCase().includes(keyword)
+)
+.forEach(note => {
+
+notesDiv.innerHTML += `
+<div class="note">
+<h3>${note.title}</h3>
+<p><b>${note.category}</b></p>
+<p>${note.content}</p>
+</div>
+`;
+
+});
+
+}
+
+renderNotes();
+
+</script>
 
 </body>
 </html>
