@@ -67,6 +67,43 @@ window.loadNotes = async function () {
   });
 };
 
+/* RESERVE */
+const CLOUD_NAME = "dchcfewzs";
+const UPLOAD_PRESET = "hurfpbdu";
+
+async function uploadToCloudinary(file) {
+  if (!file) return "";
+
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("upload_preset", UPLOAD_PRESET);
+
+  try {
+    const res = await fetch(
+      `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/upload`,
+      {
+        method: "POST",
+        body: formData
+      }
+    );
+
+    const data = await res.json();
+
+    if (!data.secure_url) {
+      console.error("Cloudinary error:", data);
+      alert("Image upload failed");
+      return "";
+    }
+
+    return data.secure_url;
+
+  } catch (err) {
+    console.error("Upload error:", err);
+    alert("Upload failed");
+    return "";
+  }
+}
+
 /* DELETE */
 window.del = async function (id) {
   await deleteDoc(doc(db, "notes", id));
