@@ -1,140 +1,67 @@
-const quill =
-new Quill('#editor',{
+document.addEventListener('DOMContentLoaded', loadNotes);
 
-theme:'snow'
+// 1. Theme Switcher (Cycles colors when clicking the emoji button)
+const themes = ['#f5f7fb', '#fff0f5', '#e6f2ff', '#e6ffe6', '#fff5e6'];
+let themeIndex = 0;
 
-});
+document.getElementById('secretColorBtn').onclick = () => {
+    themeIndex = (themeIndex + 1) % themes.length;
+    document.body.style.backgroundColor = themes[themeIndex];
+};
 
-import { db }
-from './firebase.js';
+// 2. Upload/Add Note Logic
+function addNote() {
+    const title = document.getElementById('noteTitle').value;
+    const category = document.getElementById('noteCategory').value;
+    const body = document.getElementById('noteBody').value;
 
-import {
+    if (!title || !body) {
+        alert("Please enter both a title and some text for your diary entry!");
+        return;
+    }
 
-collection,
-addDoc
+    const note = { title, category, body, id: Date.now() };
 
-}
-from
-"https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+    saveToStorage(note);
+    renderNoteHTML(note);
 
-document
-.getElementById("saveBtn")
-.addEventListener("click",
-
-async()=>{
-
-const title =
-document
-.getElementById("noteTitle")
-.value;
-
-const category =
-document
-.getElementById("category")
-.value;
-
-const content =
-quill.root.innerHTML;
-
-await addDoc(
-
-collection(db,"notes"),
-
-{
-
-title,
-category,
-content,
-
-createdAt:
-new Date()
-
+    // Clear the inputs
+    document.getElementById('noteTitle').value = '';
+    document.getElementById('noteBody').value = '';
 }
 
-);
+// 3. Render Note on Screen
+function renderNoteHTML(note) {
+    const container = document.getElementById('notesContainer');
+    const noteDiv = document.createElement('div');
+    noteDiv.className = 'note-card';
+    noteDiv.setAttribute('data-id', note.id);
 
-alert("saved");
-
-});
-
-import {
-
-ref,
-uploadBytes,
-getDownloadURL
-
-}
-from
-"https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js";
-
-import {
-storage
-}
-from './firebase.js';
-
-async function uploadFile(){
-
-const file =
-document
-.getElementById("fileInput")
-.files[0];
-
-if(!file) return null;
-
-const storageRef =
-ref(
-storage,
-"uploads/"+Date.now()+file.name
-);
-
-await uploadBytes(
-storageRef,
-file
-);
-
-return await
-getDownloadURL(
-storageRef
-);
-
+    noteDiv.innerHTML = `
+        <h3>${note.title} <span class="category-tag">${note.category}</span></h3>
+        <p>${note.body}</p>
+        <button class="delete-btn" onclick="deleteNote(${note.id})">Delete</button>
+        <div style="clear:both;"></div>
+    `;
+    container.prepend(noteDiv); // Puts newest notes at the top
 }
 
-const fileUrl =
-await uploadFile();
-
-await addDoc(
-
-collection(db,"notes"),
-
-{
-
-title,
-category,
-content,
-
-fileUrl
-
+// 4. Persistence (LocalStorage) Logic
+function saveToStorage(note) {
+    let notes = JSON.parse(localStorage.getItem('diaryNotes') || '[]');
+    notes.push(note);
+    localStorage.setItem('diaryNotes', JSON.stringify(notes));
 }
 
-);
-
-import {
-
-GoogleAuthProvider,
-signInWithPopup,
-getAuth
-
+function loadNotes() {
+    const notes = JSON.parse(localStorage.getItem('diaryNotes') || '[]');
+    notes.forEach(renderNoteHTML);
 }
-from
-"https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
-const auth =
-getAuth();
-
-const provider =
-new GoogleAuthProvider();
-
-await signInWithPopup(
-auth,
-provider
-);
+// 5. Delete Logic
+function deleteNote(id) {
+    let notes = JSON.parse(localStorage.getItem('diaryNotes') || '[]');
+    notes = notes.filter(note => note.id !== id);
+    localStorage.setItem('diaryNotes', JSON.stringify(notes));
+    document.querySelector(`[data-id="${id}"]`).remove();
+}
