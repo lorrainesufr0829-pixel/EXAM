@@ -11,7 +11,7 @@
 
 body {
   margin: 0;
-  font-family: Arial;
+  font-family: Times New Roman;
   display: flex;
 }
 
@@ -83,7 +83,32 @@ button {
 
   <hr>
 
-  <input type="color" onchange="setTheme(this.value)">
+  <button onclick="toggleSettings()">⚙ Settings</button>
+
+<div id="settingsPanel" style="display:none; margin-top:10px;">
+  <p style="margin:5px 0;">Theme</p>
+
+  <button onclick="openSettings()" style="width:100%; margin-top:10px;">
+  🎨Settings
+</button>
+
+  <!-- SETTINGS MODAL -->
+<div id="settingsModal" class="modal">
+  <div class="modal-content">
+    <h3>Settings</h3>
+
+    <p>Theme Color</p>
+    <div style="display:flex; gap:8px;">
+      <input type="color" onchange="setTheme(this.value)">
+      <input type="color" onchange="setTheme(this.value)">
+      <input type="color" onchange="setTheme(this.value)">
+      <input type="color" onchange="setTheme(this.value)">
+    </div>
+
+    <br>
+
+    <button onclick="closeSettings()">Close</button>
+  </div>
 </div>
 
 <!-- MAIN -->
@@ -101,6 +126,7 @@ button {
 
 <script type="module">
 
+  
 /* ================= FIREBASE ================= */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {
