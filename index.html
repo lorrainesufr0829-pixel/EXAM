@@ -11,13 +11,13 @@
 
 body {
   margin: 0;
-  font-family: Times New Roman;
+  font-family:Times New Roman;
   display: flex;
 }
 
-/* Sidebar */
+/* ================= SIDEBAR ================= */
 #sidebar {
-  width: 220px;
+  width: 230px;
   height: 100vh;
   background: var(--main-color);
   color: white;
@@ -26,16 +26,24 @@ body {
 }
 
 .category {
+  padding: 8px 10px;
+  margin: 6px 0;
+  border-radius: 6px;
   cursor: pointer;
-  margin: 10px 0;
-  padding: 5px;
+  transition: 0.2s;
 }
 
 .category:hover {
-  background: rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.15);
 }
 
-/* Main */
+.category.active {
+  background: rgba(255,255,255,0.3);
+  font-weight: bold;
+  transform: translateX(3px);
+}
+
+/* ================= MAIN ================= */
 #main {
   flex: 1;
   padding: 20px;
@@ -45,11 +53,37 @@ body {
   border: 1px solid #ddd;
   padding: 10px;
   margin: 10px 0;
-  border-radius: 6px;
+  border-radius: 8px;
 }
 
-button {
-  margin-top: 5px;
+/* ================= MODAL ================= */
+.modal {
+  display: none;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.4);
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  width: 320px;
+  transform: translateY(-15px);
+  opacity: 0;
+  transition: 0.25s;
+}
+
+.modal.show {
+  display: flex;
+}
+
+.modal.show .modal-content {
+  transform: translateY(0);
+  opacity: 1;
 }
 </style>
 </head>
@@ -58,12 +92,12 @@ button {
 
 <!-- SIDEBAR -->
 <div id="sidebar">
-  <h3>Notebook</h3>
+  <h3> CERVEAU🧠</h3>
 
-  <div class="category" onclick="setCategory('French')">French</div>
-  <div class="category" onclick="setCategory('English')">English</div>
-  <div class="category" onclick="setCategory('Law')">Law</div>
-  <div class="category" onclick="setCategory('Diary')">Diary</div>
+  <div class="category" data-cat="French" onclick="setCategory('French')">French</div>
+  <div class="category" data-cat="English" onclick="setCategory('English')">English</div>
+  <div class="category" data-cat="Law" onclick="setCategory('Law')">Law</div>
+  <div class="category" data-cat="Diary" onclick="setCategory('Diary')">Diary</div>
 
   <hr>
 
@@ -71,27 +105,30 @@ button {
 
   <hr>
 
-  <button onclick="setLang('en')">EN</button>
-  <button onclick="setLang('zh')">中</button>
+  <button onclick="openSettings()">⚙ Settings</button>
+</div>
 
-  <hr>
+<!-- MAIN -->
+<div id="main">
+  <h2 id="mainTitle">Notes</h2>
+  <h4 id="categoryTitle" style="margin-top:-10px;color:#666;"></h4>
 
-  <button onclick="toggleSettings()">⚙ Settings</button>
+  <input id="noteTitle" placeholder="Title"><br><br>
+  <textarea id="noteContent" placeholder="Content"></textarea><br><br>
+  <input type="file" id="image"><br><br>
 
-<div id="settingsPanel" style="display:none; margin-top:10px;">
-  <p style="margin:5px 0;">Theme</p>
+  <button onclick="new idea()">Create</button>
 
-  <button onclick="openSettings()" style="width:100%; margin-top:10px;">
-  🎨Settings
-</button>
+  <div id="notes"></div>
+</div>
 
-  <!-- SETTINGS MODAL -->
+<!-- SETTINGS MODAL -->
 <div id="settingsModal" class="modal">
   <div class="modal-content">
     <h3>Settings</h3>
 
     <p>Theme Color</p>
-    <div style="display:flex; gap:8px;">
+    <div style="display:flex;gap:8px;">
       <input type="color" onchange="setTheme(this.value)">
       <input type="color" onchange="setTheme(this.value)">
       <input type="color" onchange="setTheme(this.value)">
@@ -99,81 +136,52 @@ button {
     </div>
 
     <br>
-
     <button onclick="closeSettings()">Close</button>
   </div>
 </div>
 
-<!-- MAIN -->
-<div id="main">
-   <h2 id="title">Notes</h2>
-   <h4 id="currentCategoryTitle" style="color:#666;margin-top:-10px;"></h4>
-
-  <input id="noteTitle" placeholder="Title"><br><br>
-  <textarea id="noteContent" placeholder="Content"></textarea><br><br>
-  <input type="file" id="image"><br><br>
-
-  <button onclick="createNote()">Create Note</button>
-
-  <div id="notes"></div>
-</div>
-
 <script type="module">
 
-  
 /* ================= FIREBASE ================= */
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import {
-  getFirestore,
-  collection,
-  addDoc,
-  getDocs,
-  deleteDoc,
-  doc
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
 
-/* 🔴 1. FIREBASE CONFIG */
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyCA0xyzDy7JmaQEINTvqmXfVzfAh1cNyk0",
   authDomain: "exam0829-3c850.firebaseapp.com",
   projectId: "exam0829-3c850",
+  storageBucket: "exam0829-3c850.firebasestorage.app",
+  messagingSenderId: "617125485040",
+  appId: "1:617125485040:web:434b11e219543789882535",
+  measurementId: "G-8TLDDWCC7V"
 };
 
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+const analytics = getAnalytics(app);
 
-/* 🔴 2. CLOUDINARY CONFIG */
+  
+/* ================= CLOUDINARY ================= */
 const CLOUD_NAME = "dchcfewzs";
 const UPLOAD_PRESET = "hurfpbdu";
 
-/* 🔴 3. PASSWORD */
-const APP_PASSWORD = "1234";
-
-/* ================= STATE ================= */
-let currentCategory = "French";
-let lang = "en";
-
-/* ================= LOGIN ================= */
-window.checkPwd = function () {
-  const v = document.getElementById("pwd").value;
-  if (v === APP_PASSWORD) {
-    document.getElementById("login").style.display = "none";
-  } else {
-    alert("Wrong password");
-  }
-};
 
 /* ================= CATEGORY ================= */
 window.setCategory = function (c) {
   currentCategory = c;
-  loadNotes();
-};
 
-/* ================= LANGUAGE ================= */
-window.setLang = function (l) {
-  lang = l;
-  document.getElementById("title").innerText =
-    l === "en" ? "Notes" : "笔记";
+  document.getElementById("categoryTitle").innerText = c;
+
+  document.querySelectorAll(".category").forEach(el => {
+    el.classList.toggle("active", el.dataset.cat === c);
+  });
+
+  loadNotes();
 };
 
 /* ================= THEME ================= */
@@ -186,14 +194,14 @@ if (localStorage.getItem("theme")) {
   setTheme(localStorage.getItem("theme"));
 }
 
-/* ================= CLOUDINARY UPLOAD ================= */
+/* ================= CLOUDINARY ================= */
 async function uploadImage(file) {
   const form = new FormData();
   form.append("file", file);
-  form.append("upload_preset", UPLOAD_PRESET);
+  form.append("upload_preset", hurfpbdu);
 
   const res = await fetch(
-    `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/upload`,
+    `https://api.cloudinary.com/v1_1/${dchcfewzs}/upload`,
     { method: "POST", body: form }
   );
 
@@ -261,7 +269,24 @@ window.deleteNote = async function (id) {
   loadNotes();
 };
 
+/* ================= SETTINGS ================= */
+window.openSettings = function () {
+  const m = document.getElementById("settingsModal");
+  m.classList.add("show");
+};
+
+window.closeSettings = function () {
+  const m = document.getElementById("settingsModal");
+  m.classList.remove("show");
+};
+
+/* click outside close */
+document.getElementById("settingsModal").addEventListener("click", (e) => {
+  if (e.target.id === "settingsModal") closeSettings();
+});
+
 /* INIT */
+setCategory("French");
 loadNotes();
 
 </script>
