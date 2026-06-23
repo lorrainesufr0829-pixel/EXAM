@@ -2,56 +2,192 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>RACHELAND</title>
-<link rel="stylesheet" href="style.css">
+<title>RACHELAND 1.0</title>
+
+<style>
+:root{
+  --main:#2c3e50;
+}
+
+body{
+  margin:0;
+  display:flex;
+  font-family:Arial;
+}
+
+/* SIDEBAR */
+#sidebar{
+  width:240px;
+  height:100vh;
+  background:var(--main);
+  color:#fff;
+  padding:20px;
+}
+
+.cat{
+  padding:10px;
+  margin:6px 0;
+  cursor:pointer;
+  border-radius:6px;
+}
+
+.cat.active{
+  background:rgba(255,255,255,0.3);
+}
+
+/* MAIN */
+#main{
+  flex:1;
+  padding:20px;
+}
+
+.note{
+  background:#fff;
+  padding:10px;
+  margin:10px 0;
+}
+
+/* MODAL */
+#modal{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.4);
+  justify-content:center;
+  align-items:center;
+}
+
+.box{
+  background:#fff;
+  padding:20px;
+}
+</style>
 </head>
 
 <body>
 
 <!-- SIDEBAR -->
 <div id="sidebar">
-  <h2>Notebook</h2>
+  <h3>Notebook</h3>
 
-  <div class="cat active" data-cat="French">French</div>
+  <div class="cat" data-cat="French">French</div>
   <div class="cat" data-cat="English">English</div>
   <div class="cat" data-cat="Law">Law</div>
   <div class="cat" data-cat="Diary">Diary</div>
 
   <hr>
 
-  <input id="search" placeholder="Search notes...">
-
   <button id="settingsBtn">⚙ Settings</button>
 </div>
 
 <!-- MAIN -->
 <div id="main">
-  <div class="header">
-    <h1 id="title">Notes</h1>
-    <h3 id="currentCat">French</h3>
-  </div>
+  <h1 id="title">Notes</h1>
+  <h3 id="currentCat">French</h3>
 
-  <div class="editor">
-    <input id="noteTitle" placeholder="Title">
-    <textarea id="noteContent" placeholder="Write something..."></textarea>
-    <input type="file" id="file">
-    <button id="createBtn">+ Create Note</button>
-  </div>
+  <input id="inputTitle" placeholder="title"><br><br>
+  <textarea id="inputContent" placeholder="content"></textarea><br><br>
+
+  <button id="addBtn">Create</button>
 
   <div id="notes"></div>
 </div>
 
-<!-- SETTINGS MODAL -->
+<!-- MODAL -->
 <div id="modal">
-  <div class="modalBox">
+  <div class="box">
     <h3>Settings</h3>
-    <p>Theme Color</p>
-    <input type="color" id="colorPicker">
 
-    <button id="closeModal">Close</button>
+    <input type="color" id="color">
+
+    <br><br>
+    <button id="close">Close</button>
   </div>
 </div>
 
-<script type="module" src="app.js"></script>
+<script>
+/* ================= STATE ================= */
+let currentCat = "French";
+
+/* ================= DOM READY ================= */
+document.addEventListener("DOMContentLoaded", () => {
+
+  /* CATEGORY CLICK（关键：事件委托修复） */
+  document.querySelectorAll(".cat").forEach(el => {
+    el.addEventListener("click", () => {
+
+      currentCat = el.dataset.cat;
+
+      document.getElementById("currentCat").innerText = currentCat;
+
+      document.querySelectorAll(".cat").forEach(c => c.classList.remove("active"));
+      el.classList.add("active");
+
+      loadNotes();
+    });
+  });
+
+  /* SETTINGS OPEN */
+  document.getElementById("settingsBtn").addEventListener("click", () => {
+    document.getElementById("modal").style.display = "flex";
+  });
+
+  /* SETTINGS CLOSE */
+  document.getElementById("close").addEventListener("click", () => {
+    document.getElementById("modal").style.display = "none";
+  });
+
+  /* THEME */
+  document.getElementById("color").addEventListener("input", (e) => {
+    document.documentElement.style.setProperty("--main", e.target.value);
+  });
+
+  /* CREATE NOTE (本地版先跑通逻辑) */
+  document.getElementById("addBtn").addEventListener("click", () => {
+
+    const title = document.getElementById("inputTitle").value;
+    const content = document.getElementById("inputContent").value;
+
+    const notes = JSON.parse(localStorage.getItem("notes") || "[]");
+
+    notes.push({
+      title,
+      content,
+      category: currentCat
+    });
+
+    localStorage.setItem("notes", JSON.stringify(notes));
+
+    loadNotes();
+  });
+
+  loadNotes();
+});
+
+/* ================= LOAD ================= */
+function loadNotes() {
+
+  const box = document.getElementById("notes");
+  const notes = JSON.parse(localStorage.getItem("notes") || "[]");
+
+  box.innerHTML = "";
+
+  notes.forEach(n => {
+
+    if (n.category !== currentCat) return;
+
+    const div = document.createElement("div");
+    div.className = "note";
+
+    div.innerHTML = `
+      <b>${n.title}</b>
+      <p>${n.content}</p>
+    `;
+
+    box.appendChild(div);
+  });
+}
+</script>
+
 </body>
 </html>
