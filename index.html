@@ -3,293 +3,66 @@
 <head>
 <meta charset="UTF-8">
 <title>RACHELAND</title>
-
-<style>
-:root {
-  --main-color: #2c3e50;
-}
-
-body {
-  margin: 0;
-  font-family:Times New Roman;
-  display: flex;
-}
-
-/* ================= SIDEBAR ================= */
-#sidebar {
-  width: 230px;
-  height: 100vh;
-  background: var(--main-color);
-  color: white;
-  padding: 20px;
-  box-sizing: border-box;
-}
-
-.category {
-  padding: 8px 10px;
-  margin: 6px 0;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-.category:hover {
-  background: rgba(255,255,255,0.15);
-}
-
-.category.active {
-  background: rgba(255,255,255,0.3);
-  font-weight: bold;
-  transform: translateX(3px);
-}
-
-/* ================= MAIN ================= */
-#main {
-  flex: 1;
-  padding: 20px;
-}
-
-.note {
-  border: 1px solid #ddd;
-  padding: 10px;
-  margin: 10px 0;
-  border-radius: 8px;
-}
-
-/* ================= MODAL ================= */
-.modal {
-  display: none;
-  position: fixed;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.4);
-  justify-content: center;
-  align-items: center;
-}
-
-.modal-content {
-  background: white;
-  padding: 20px;
-  border-radius: 12px;
-  width: 320px;
-  transform: translateY(-15px);
-  opacity: 0;
-  transition: 0.25s;
-}
-
-.modal.show {
-  display: flex;
-}
-
-.modal.show .modal-content {
-  transform: translateY(0);
-  opacity: 1;
-}
-</style>
+<link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
 <!-- SIDEBAR -->
 <div id="sidebar">
-  <h3> CERVEAU🧠</h3>
+  <h2>Notebook</h2>
 
-  <div class="category" data-cat="French" onclick="setCategory('French')">French</div>
-  <div class="category" data-cat="English" onclick="setCategory('English')">English</div>
-  <div class="category" data-cat="Law" onclick="setCategory('Law')">Law</div>
-  <div class="category" data-cat="Diary" onclick="setCategory('Diary')">Diary</div>
-
-  <hr>
-
-  <input id="search" placeholder="Search..." oninput="loadNotes()" style="width:100%">
+  <div class="cat" onclick="setCat('French')">French</div>
+  <div class="cat" onclick="setCat('English')">English</div>
+  <div class="cat" onclick="setCat('Law')">Law</div>
+  <div class="cat" onclick="setCat('Diary')">Diary</div>
 
   <hr>
 
-  <button onclick="openSettings()">⚙ Settings</button>
-</div>
+  <input id="search" placeholder="Search..." oninput="loadNotes()">
 
-<!-- MAIN -->
-<div id="main">
-  <h2 id="mainTitle">Notes</h2>
-  <h4 id="categoryTitle" style="margin-top:-10px;color:#666;"></h4>
+<button onclick="openSettings()"> 🎨🎨Theme Color </button>
 
-  <input id="noteTitle" placeholder="Title"><br><br>
-  <textarea id="noteContent" placeholder="Content"></textarea><br><br>
-  <input type="file" id="image"><br><br>
-
-  <button onclick="create note()">Create</button>
-
-  <div id="notes"></div>
-</div>
-
-<!-- SETTINGS MODAL -->
-<div id="settingsModal" class="modal">
-  <div class="modal-content">
+<div id="modal" class="modal">
+  <div class="modalBox">
     <h3>Settings</h3>
 
     <p>Theme Color</p>
-    <div style="display:flex;gap:8px;">
-      <input type="color" onchange="setTheme(this.value)">
-      <input type="color" onchange="setTheme(this.value)">
-      <input type="color" onchange="setTheme(this.value)">
-      <input type="color" onchange="setTheme(this.value)">
-    </div>
+    <input type="color" onchange="setTheme(this.value)">
 
-    <br>
+    <br><br>
     <button onclick="closeSettings()">Close</button>
   </div>
 </div>
 
-<script type="module">
+<!-- MAIN -->
+<div id="main">
+  <h1 id="title">Notes</h1>
+  <h3 id="currentCat"></h3>
 
-/* ================= FIREBASE ================= */
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+  <input id="noteTitle" placeholder="Title"><br>
+  <textarea id="noteContent" placeholder="Content"></textarea><br>
+  <input type="file" id="file"><br>
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyCA0xyzDy7JmaQEINTvqmXfVzfAh1cNyk0",
-  authDomain: "exam0829-3c850.firebaseapp.com",
-  projectId: "exam0829-3c850",
-  storageBucket: "exam0829-3c850.firebasestorage.app",
-  messagingSenderId: "617125485040",
-  appId: "1:617125485040:web:434b11e219543789882535",
-  measurementId: "G-8TLDDWCC7V"
-};
+  <button onclick="createNote()">Create</button>
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+  <div id="notes"></div>
+</div>
 
-  
-/* ================= CLOUDINARY ================= */
-const CLOUD_NAME = "dchcfewzs";
-const UPLOAD_PRESET = "hurfpbdu";
+<!-- SETTINGS -->
+<div id="modal">
+  <div class="modalBox">
+    <h3>Settings</h3>
 
+    <p>Theme</p>
+    <input type="color" onchange="setTheme(this.value)">
 
-/* ================= CATEGORY ================= */
-window.setCategory = function (c) {
-  currentCategory = c;
+    <button onclick="closeSettings()">Close</button>
+  </div>
+</div>
 
-  document.getElementById("categoryTitle").innerText = c;
-
-  document.querySelectorAll(".category").forEach(el => {
-    el.classList.toggle("active", el.dataset.cat === c);
-  });
-
-  loadNotes();
-};
-
-/* ================= THEME ================= */
-window.setTheme = function (color) {
-  document.documentElement.style.setProperty("--main-color", color);
-  localStorage.setItem("theme", color);
-};
-
-if (localStorage.getItem("theme")) {
-  setTheme(localStorage.getItem("theme"));
-}
-
-/* ================= CLOUDINARY ================= */
-async function uploadImage(file) {
-  const form = new FormData();
-  form.append("file", file);
-  form.append("upload_preset", hurfpbdu);
-
-  const res = await fetch(
-    `https://api.cloudinary.com/v1_1/${dchcfewzs}/upload`,
-    { method: "POST", body: form }
-  );
-
-  const data = await res.json();
-  return data.secure_url;
-}
-
-/* ================= CREATE ================= */
-window.createNote = async function () {
-  const title = document.getElementById("noteTitle").value;
-  const content = document.getElementById("noteContent").value;
-  const file = document.getElementById("image").files[0];
-
-  let imageUrl = "";
-  if (file) imageUrl = await uploadImage(file);
-
-  await addDoc(collection(db, "notes"), {
-    title,
-    content,
-    imageUrl,
-    category: currentCategory,
-    createdAt: Date.now()
-  });
-
-  loadNotes();
-};
-
-/* ================= LOAD ================= */
-window.loadNotes = async function () {
-  const search = document.getElementById("search").value.toLowerCase();
-  const snap = await getDocs(collection(db, "notes"));
-
-  const box = document.getElementById("notes");
-  box.innerHTML = "";
-
-  snap.forEach(d => {
-    const data = d.data();
-
-    if (data.category !== currentCategory) return;
-
-    if (
-      search &&
-      !data.title.toLowerCase().includes(search) &&
-      !data.content.toLowerCase().includes(search)
-    ) return;
-
-    const div = document.createElement("div");
-    div.className = "note";
-
-    div.innerHTML = `
-      <b>${data.title}</b>
-      <p>${data.content}</p>
-      ${data.imageUrl ? `<img src="${data.imageUrl}" width="150">` : ""}
-      <br>
-      <button onclick="deleteNote('${d.id}')">Delete</button>
-    `;
-
-    box.appendChild(div);
-  });
-};
-
-/* ================= DELETE ================= */
-window.deleteNote = async function (id) {
-  await deleteDoc(doc(db, "notes", id));
-  loadNotes();
-};
-
-/* ================= SETTINGS ================= */
-window.openSettings = function () {
-  const m = document.getElementById("settingsModal");
-  m.classList.add("show");
-};
-
-window.closeSettings = function () {
-  const m = document.getElementById("settingsModal");
-  m.classList.remove("show");
-};
-
-/* click outside close */
-document.getElementById("settingsModal").addEventListener("click", (e) => {
-  if (e.target.id === "settingsModal") closeSettings();
-});
-
-/* INIT */
-setCategory("French");
-loadNotes();
-
-</script>
+<script type="module" src="firebase.js"></script>
+<script type="module" src="app.js"></script>
 
 </body>
 </html>
