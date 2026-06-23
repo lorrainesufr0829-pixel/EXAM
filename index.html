@@ -56,13 +56,6 @@ button {
 
 <body>
 
-<!-- LOGIN -->
-<div id="login" style="position:fixed;top:0;left:0;width:100%;height:100%;background:#fff;display:flex;justify-content:center;align-items:center;flex-direction:column;">
-  <h2>Enter Password</h2>
-  <input id="pwd" type="password">
-  <button onclick="checkPwd()">Enter</button>
-</div>
-
 <!-- SIDEBAR -->
 <div id="sidebar">
   <h3>Notebook</h3>
@@ -113,7 +106,8 @@ button {
 
 <!-- MAIN -->
 <div id="main">
-  <h2 id="title">Notes</h2>
+   <h2 id="title">Notes</h2>
+   <h4 id="currentCategoryTitle" style="color:#666;margin-top:-10px;"></h4>
 
   <input id="noteTitle" placeholder="Title"><br><br>
   <textarea id="noteContent" placeholder="Content"></textarea><br><br>
