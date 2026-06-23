@@ -1,23 +1,33 @@
-body {
-  margin: 0;
-  display: flex;
-  font-family:Times New Roman;
+:root {
+  --main: #2c3e50;
 }
 
-
+body {
+  margin: 0;
+  font-family: Arial;
+  display: flex;
+  background: #f5f6f8;
+}
 
 /* SIDEBAR */
 #sidebar {
-  width: 220px;
+  width: 240px;
   height: 100vh;
-  background: #2c3e50;
+  background: var(--main);
   color: white;
-  padding: 15px;
+  padding: 20px;
 }
 
 .cat {
-  padding: 8px;
+  padding: 10px;
+  margin: 5px 0;
   cursor: pointer;
+  border-radius: 6px;
+  transition: .2s;
+}
+
+.cat:hover {
+  background: rgba(255,255,255,0.15);
 }
 
 .cat.active {
@@ -27,13 +37,42 @@ body {
 /* MAIN */
 #main {
   flex: 1;
-  padding: 20px;
+  padding: 25px;
 }
 
-.note {
-  border: 1px solid #ddd;
-  margin: 10px 0;
+.header h1 {
+  margin: 0;
+}
+
+.editor {
+  margin: 20px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+input, textarea {
   padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+}
+
+button {
+  padding: 10px;
+  border: none;
+  background: var(--main);
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* NOTES */
+.note {
+  background: white;
+  padding: 15px;
+  margin: 10px 0;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
 /* MODAL */
@@ -49,4 +88,6 @@ body {
 .modalBox {
   background: white;
   padding: 20px;
+  border-radius: 10px;
+  width: 300px;
 }
