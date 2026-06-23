@@ -1,35 +1,250 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rachel Land</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<title>RACHELAND</title>
+
+<style>
+:root {
+  --main-color: #2c3e50;
+}
+
+body {
+  margin: 0;
+  font-family: Arial;
+  display: flex;
+}
+
+/* Sidebar */
+#sidebar {
+  width: 220px;
+  height: 100vh;
+  background: var(--main-color);
+  color: white;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.category {
+  cursor: pointer;
+  margin: 10px 0;
+  padding: 5px;
+}
+
+.category:hover {
+  background: rgba(255,255,255,0.2);
+}
+
+/* Main */
+#main {
+  flex: 1;
+  padding: 20px;
+}
+
+.note {
+  border: 1px solid #ddd;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 6px;
+}
+
+button {
+  margin-top: 5px;
+}
+</style>
 </head>
+
 <body>
 
-    <button id="secretColorBtn">🎨</button>
+<!-- LOGIN -->
+<div id="login" style="position:fixed;top:0;left:0;width:100%;height:100%;background:#fff;display:flex;justify-content:center;align-items:center;flex-direction:column;">
+  <h2>Enter Password</h2>
+  <input id="pwd" type="password">
+  <button onclick="checkPwd()">Enter</button>
+</div>
 
-    <div class="diary-container">
-        <h1>Rachel Land</h1>
-        
-        <div class="note-form">
-            <input type="text" id="noteTitle" placeholder="Note Title...">
-            
-            <select id="noteCategory">
-                <option value="French learning">🥐 FR </option>
-                <option value="English learning">😶‍🌫️ EN </option>
-                <option value="Law">💼 Law </option>
-                <option value="Ideas">💡 Ideas</option>
-            </select>
-            
-            <textarea id="noteBody" placeholder="Write your thoughts here..."></textarea>
-            <button onclick="addNote()">Save Note</button>
-        </div>
+<!-- SIDEBAR -->
+<div id="sidebar">
+  <h3>Notebook</h3>
 
-        <div id="notesContainer"></div>
-    </div>
+  <div class="category" onclick="setCategory('French')">French</div>
+  <div class="category" onclick="setCategory('English')">English</div>
+  <div class="category" onclick="setCategory('Law')">Law</div>
+  <div class="category" onclick="setCategory('Diary')">Diary</div>
 
-    <script src="script.js"></script>
+  <hr>
+
+  <input id="search" placeholder="Search..." oninput="loadNotes()" style="width:100%">
+
+  <hr>
+
+  <button onclick="setLang('en')">EN</button>
+  <button onclick="setLang('zh')">中</button>
+
+  <hr>
+
+  <input type="color" onchange="setTheme(this.value)">
+</div>
+
+<!-- MAIN -->
+<div id="main">
+  <h2 id="title">Notes</h2>
+
+  <input id="noteTitle" placeholder="Title"><br><br>
+  <textarea id="noteContent" placeholder="Content"></textarea><br><br>
+  <input type="file" id="image"><br><br>
+
+  <button onclick="createNote()">Create Note</button>
+
+  <div id="notes"></div>
+</div>
+
+<script type="module">
+
+/* ================= FIREBASE ================= */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  getDocs,
+  deleteDoc,
+  doc
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+/* 🔴 1. FIREBASE CONFIG */
+const firebaseConfig = {
+  apiKey: "AIzaSyCA0xyzDy7JmaQEINTvqmXfVzfAh1cNyk0",
+  authDomain: "exam0829-3c850.firebaseapp.com",
+  projectId: "exam0829-3c850",
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+/* 🔴 2. CLOUDINARY CONFIG */
+const CLOUD_NAME = "dchcfewzs";
+const UPLOAD_PRESET = "hurfpbdu";
+
+/* 🔴 3. PASSWORD */
+const APP_PASSWORD = "1234";
+
+/* ================= STATE ================= */
+let currentCategory = "French";
+let lang = "en";
+
+/* ================= LOGIN ================= */
+window.checkPwd = function () {
+  const v = document.getElementById("pwd").value;
+  if (v === APP_PASSWORD) {
+    document.getElementById("login").style.display = "none";
+  } else {
+    alert("Wrong password");
+  }
+};
+
+/* ================= CATEGORY ================= */
+window.setCategory = function (c) {
+  currentCategory = c;
+  loadNotes();
+};
+
+/* ================= LANGUAGE ================= */
+window.setLang = function (l) {
+  lang = l;
+  document.getElementById("title").innerText =
+    l === "en" ? "Notes" : "笔记";
+};
+
+/* ================= THEME ================= */
+window.setTheme = function (color) {
+  document.documentElement.style.setProperty("--main-color", color);
+  localStorage.setItem("theme", color);
+};
+
+if (localStorage.getItem("theme")) {
+  setTheme(localStorage.getItem("theme"));
+}
+
+/* ================= CLOUDINARY UPLOAD ================= */
+async function uploadImage(file) {
+  const form = new FormData();
+  form.append("file", file);
+  form.append("upload_preset", UPLOAD_PRESET);
+
+  const res = await fetch(
+    `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/upload`,
+    { method: "POST", body: form }
+  );
+
+  const data = await res.json();
+  return data.secure_url;
+}
+
+/* ================= CREATE ================= */
+window.createNote = async function () {
+  const title = document.getElementById("noteTitle").value;
+  const content = document.getElementById("noteContent").value;
+  const file = document.getElementById("image").files[0];
+
+  let imageUrl = "";
+  if (file) imageUrl = await uploadImage(file);
+
+  await addDoc(collection(db, "notes"), {
+    title,
+    content,
+    imageUrl,
+    category: currentCategory,
+    createdAt: Date.now()
+  });
+
+  loadNotes();
+};
+
+/* ================= LOAD ================= */
+window.loadNotes = async function () {
+  const search = document.getElementById("search").value.toLowerCase();
+  const snap = await getDocs(collection(db, "notes"));
+
+  const box = document.getElementById("notes");
+  box.innerHTML = "";
+
+  snap.forEach(d => {
+    const data = d.data();
+
+    if (data.category !== currentCategory) return;
+
+    if (
+      search &&
+      !data.title.toLowerCase().includes(search) &&
+      !data.content.toLowerCase().includes(search)
+    ) return;
+
+    const div = document.createElement("div");
+    div.className = "note";
+
+    div.innerHTML = `
+      <b>${data.title}</b>
+      <p>${data.content}</p>
+      ${data.imageUrl ? `<img src="${data.imageUrl}" width="150">` : ""}
+      <br>
+      <button onclick="deleteNote('${d.id}')">Delete</button>
+    `;
+
+    box.appendChild(div);
+  });
+};
+
+/* ================= DELETE ================= */
+window.deleteNote = async function (id) {
+  await deleteDoc(doc(db, "notes", id));
+  loadNotes();
+};
+
+/* INIT */
+loadNotes();
+
+</script>
+
 </body>
 </html>
