@@ -1,103 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-
-<title>My Notes</title>
-
-<link rel="stylesheet" href="style.css">
-
-<link
-href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css"
-rel="stylesheet">
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rachel Land</title>
+    <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
-<div class="app">
+    <button id="secretColorBtn">🎨</button>
 
-    <aside class="sidebar">
-
-        <h1>RACHEL LAND</h1>
-
-        <button class="newBtn">
-            + New Note
-        </button>
-
-        <ul>
-
-            <li>⚖️ Law</li>
-            <li>🇫🇷 French</li>
-            <li>📖 Diary</li>
-    
-
-        </ul>
-
-    </aside>
-
-    <main>
-
-        <header>
-
-            <input
-            id="search"
-            placeholder="Search notes">
-            <botton id= "search">
-                🔍
-            </botton>
+    <div class="diary-container">
+        <h1>Rachel Land</h1>
+        
+        <div class="note-form">
+            <input type="text" id="noteTitle" placeholder="Note Title...">
             
+            <select id="noteCategory">
+                <option value="French learning">🥐 FR </option>
+                <option value="English learning">😶‍🌫️ EN </option>
+                <option value="Law">💼 Law </option>
+                <option value="Ideas">💡 Ideas</option>
+            </select>
+            
+            <textarea id="noteBody" placeholder="Write your thoughts here..."></textarea>
+            <button onclick="addNote()">Save Note</button>
+        </div>
 
-            <button id="themeBtn">
-                ⚙️
-            </button>
+        <div id="notesContainer"></div>
+    </div>
 
-        </header>
-
-        <section id="notesContainer">
-
-        </section>
-
-    </main>
-
-</div>
-
-<div id="editorModal">
-
-    <input
-    id="noteTitle"
-    placeholder="Title">
-
-    <select id="category">
-
-        <option>Law</option>
-        <option>French</option>
-        <option>Diary</option>
-        <option>Exams</option>
-
-    </select>
-
-    <div id="editor"></div>
-
-    <input
-    type="file"
-    id="fileInput">
-
-    <button id="saveBtn">
-        Save
-    </button>
-
-</div>
-
-<script
-src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js">
-</script>
-
-<script type="module" src="firebase.js"></script>
-<script type="module" src="app.js"></script>
-
+    <script src="script.js"></script>
 </body>
 </html>
