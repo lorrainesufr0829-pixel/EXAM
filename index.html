@@ -12,57 +12,46 @@
 <div id="sidebar">
   <h2>Notebook</h2>
 
-  <div class="cat" onclick="setCat('French')">French</div>
-  <div class="cat" onclick="setCat('English')">English</div>
-  <div class="cat" onclick="setCat('Law')">Law</div>
-  <div class="cat" onclick="setCat('Diary')">Diary</div>
+  <div class="cat active" data-cat="French">French</div>
+  <div class="cat" data-cat="English">English</div>
+  <div class="cat" data-cat="Law">Law</div>
+  <div class="cat" data-cat="Diary">Diary</div>
 
   <hr>
 
-  <input id="search" placeholder="Search..." oninput="loadNotes()">
+  <input id="search" placeholder="Search notes...">
 
-<button onclick="openSettings()"> 🎨🎨Theme Color </button>
-
-<div id="modal" class="modal">
-  <div class="modalBox">
-    <h3>Settings</h3>
-
-    <p>Theme Color</p>
-    <input type="color" onchange="setTheme(this.value)">
-
-    <br><br>
-    <button onclick="closeSettings()">Close</button>
-  </div>
+  <button id="settingsBtn">⚙ Settings</button>
 </div>
 
 <!-- MAIN -->
 <div id="main">
-  <h1 id="title">Notes</h1>
-  <h3 id="currentCat"></h3>
+  <div class="header">
+    <h1 id="title">Notes</h1>
+    <h3 id="currentCat">French</h3>
+  </div>
 
-  <input id="noteTitle" placeholder="Title"><br>
-  <textarea id="noteContent" placeholder="Content"></textarea><br>
-  <input type="file" id="file"><br>
-
-  <button onclick="createNote()">Create</button>
+  <div class="editor">
+    <input id="noteTitle" placeholder="Title">
+    <textarea id="noteContent" placeholder="Write something..."></textarea>
+    <input type="file" id="file">
+    <button id="createBtn">+ Create Note</button>
+  </div>
 
   <div id="notes"></div>
 </div>
 
-<!-- SETTINGS -->
+<!-- SETTINGS MODAL -->
 <div id="modal">
   <div class="modalBox">
     <h3>Settings</h3>
+    <p>Theme Color</p>
+    <input type="color" id="colorPicker">
 
-    <p>Theme</p>
-    <input type="color" onchange="setTheme(this.value)">
-
-    <button onclick="closeSettings()">Close</button>
+    <button id="closeModal">Close</button>
   </div>
 </div>
 
-<script type="module" src="firebase.js"></script>
 <script type="module" src="app.js"></script>
-
 </body>
 </html>
