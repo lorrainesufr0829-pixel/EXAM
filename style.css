@@ -92,12 +92,28 @@ button:hover { background-color: #357abd; }
   transition: all 0.25s ease;
 }
 
-/* active state */
-.modal.show {
-  display: flex;
-}
+
 
 .modal.show .modal-content {
   transform: translateY(0);
   opacity: 1;
+}
+.category {
+  cursor: pointer;
+  margin: 8px 0;
+  padding: 8px 10px;
+  border-radius: 6px;
+  transition: 0.2s;
+}
+
+/* hover */
+.category:hover {
+  background: rgba(255,255,255,0.15);
+}
+
+/* active state */
+.category.active {
+  background: rgba(255,255,255,0.3);
+  font-weight: bold;
+  transform: translateX(3px);
 }
